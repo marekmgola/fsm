@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
+    "cli": "tsx src/cli.tsx",
     "test": "vitest",
     "prepare": "husky"
   },
@@ -25,9 +26,16 @@
     "url": "https://github.com/marekmgola/fsm/issues"
   },
   "homepage": "https://github.com/marekmgola/fsm#readme",
+  "dependencies": {
+    "ink": "^6.6.0",
+    "ink-text-input": "^6.0.0",
+    "react": "^19.2.3",
+    "react-ink": "^6.5.4"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/node": "^25.0.9",
+    "@types/react": "^19.2.8",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.0.0",

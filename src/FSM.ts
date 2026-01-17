@@ -1,6 +1,6 @@
 import type * as FSMTypes from './types.js';
 
-export abstract class FSM<Input = FSMTypes.BinaryInput> {
+export abstract class FSM<Input = string | number | boolean> {
   protected currentState: FSMTypes.State;
   protected abstract readonly transitions: Map<
     FSMTypes.State,
