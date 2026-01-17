@@ -7,12 +7,8 @@ import type * as FSMTypes from './types.js';
  *
  * Dynamically generates states (S0 to Sn-1) and their transitions upon instantiation.
  */
-export class NModFSM extends FSM {
+export class NModFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
   private readonly modulus: number;
-  protected readonly transitions: Map<
-    FSMTypes.State,
-    Map<FSMTypes.BinaryInput, FSMTypes.State>
-  >;
 
   /**
    * Creates an instance of NModFSM.
@@ -21,17 +17,16 @@ export class NModFSM extends FSM {
    * @throws Error if modulus is not a positive integer.
    */
   constructor(modulus: number) {
-    super('S0'); // Initial state S0
-    this.modulus = modulus;
-
     if (modulus <= 0 || !Number.isInteger(modulus)) {
       throw new Error('Modulus must be a positive integer.');
     }
 
-    this.transitions = new Map();
+    const transitions = new Map<
+      FSMTypes.State,
+      Map<FSMTypes.BinaryInput, FSMTypes.State>
+    >();
 
-    // Generate states S0 to S{n-1}
-    // And transitions for each state with input '0' and '1'
+    // Generate states S0 to S{n-1} and transitions
     for (let i = 0; i < modulus; i++) {
       const currentState: FSMTypes.State = `S${i}`;
       const stateTransitions = new Map<FSMTypes.BinaryInput, FSMTypes.State>();
@@ -46,7 +41,13 @@ export class NModFSM extends FSM {
       const nextState1: FSMTypes.State = `S${nextVal1}`;
       stateTransitions.set('1', nextState1);
 
-      this.transitions.set(currentState, stateTransitions);
+      transitions.set(currentState, stateTransitions);
     }
+
+    super({
+      transitions,
+    });
+
+    this.modulus = modulus;
   }
 }

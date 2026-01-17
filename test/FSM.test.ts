@@ -4,27 +4,28 @@ import { NModFSM } from '../src/NModFSM.js';
 import type * as FSMTypes from '../src/types.js';
 
 // Concrete implementation for testing base FSM logic
-class ParityFSM extends FSM {
-  protected readonly transitions: Map<
-    FSMTypes.State,
-    Map<FSMTypes.BinaryInput, FSMTypes.State>
-  >;
-
+class ParityFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
   constructor() {
-    super('S0');
-    this.transitions = new Map();
-
     // S0 (Even): 0->S0, 1->S1
     const s0Trans = new Map<FSMTypes.BinaryInput, FSMTypes.State>();
     s0Trans.set('0', 'S0');
     s0Trans.set('1', 'S1');
-    this.transitions.set('S0', s0Trans);
 
     // S1 (Odd): 0->S1, 1->S0
     const s1Trans = new Map<FSMTypes.BinaryInput, FSMTypes.State>();
     s1Trans.set('0', 'S1');
     s1Trans.set('1', 'S0');
-    this.transitions.set('S1', s1Trans);
+
+    const transitions = new Map<
+      FSMTypes.State,
+      Map<FSMTypes.BinaryInput, FSMTypes.State>
+    >();
+    transitions.set('S0', s0Trans);
+    transitions.set('S1', s1Trans);
+
+    super({
+      transitions,
+    });
   }
 }
 
@@ -47,13 +48,11 @@ describe('FSM Base Class', () => {
     // or just rely on the fact that if we accessed a state not in the map it throws.
 
     // Actually, let's create a broken FSM for this test
-    class BrokenFSM extends FSM {
-      protected readonly transitions = new Map<
-        FSMTypes.State,
-        Map<FSMTypes.BinaryInput, FSMTypes.State>
-      >();
+    class BrokenFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
       constructor() {
-        super('S0');
+        super({
+          transitions: new Map(), // Empty transitions shouldn't crash constructor but will fail transition()
+        });
       }
     }
     const broken = new BrokenFSM();

@@ -50,11 +50,13 @@ The project is built around a robust Object-Oriented architecture designed for e
 classDiagram
     class FSM {
         <<abstract>>
-        +currentState: State
+        #currentState: S
+        #q0: S
         #transitions: Map
-        +transition(input: Input): State
-        +getState(): State
-        +reset(initialState: State): void
+        +constructor(config: FSMConfig)
+        +transition(input: I): S
+        +getState(): S
+        +reset(initialState?: S): void
     }
 
     class NModFSM {

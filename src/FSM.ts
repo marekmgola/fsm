@@ -6,15 +6,56 @@ import type * as FSMTypes from './types.js';
  *
  * @template Input The type of input the FSM accepts (default: string | number | boolean).
  */
-export abstract class FSM<Input = string | number | boolean> {
-  protected currentState: FSMTypes.State;
-  protected abstract readonly transitions: Map<
-    FSMTypes.State,
-    Map<Input, FSMTypes.State>
-  >;
+/**
+ * Configuration object for FSM.
+ * @template S Type of State (Q)
+ * @template I Type of Input (Σ)
+ */
+/**
+ * Configuration object for FSM.
+ * @template S Type of State (Q)
+ * @template I Type of Input (Σ)
+ */
+export interface FSMConfig<S, I> {
+  /** q0: Initial state (defaults to 'S0') */
+  initialState?: S;
+  /** δ: Transition function */
+  transitions: Map<S, Map<I, S>>;
+}
 
-  constructor(initialState: FSMTypes.State) {
-    this.currentState = initialState;
+/**
+ * Abstract base class representing a Finite State Machine.
+ * Manages the current state and handles transitions based on generic inputs.
+ *
+ * Formal Definition: (Q, Σ, q0, F, δ)
+ * Q: Finite set of states
+ * Σ: Finite input alphabet
+ * q0: Initial state (q0 ∈ Q)
+ * F: Set of accepting/final states (F ⊆ Q)
+ * δ: Transition function (δ: Q × Σ → Q)
+ *
+ * @template S The type of state in the FSM.
+ * @template I The type of input the FSM accepts.
+ */
+export abstract class FSM<S = FSMTypes.State, I = string | number | boolean> {
+  protected currentState: S;
+
+  // Formal properties
+  /** q0: Initial state */
+  protected readonly q0: S;
+
+  /** δ: Transition function */
+  protected readonly transitions: Map<S, Map<I, S>>;
+
+  /**
+   * Initializes the FSM with a configuration object.
+   *
+   * @param config The FSM configuration (q0, δ).
+   */
+  constructor(config: FSMConfig<S, I>) {
+    this.q0 = config.initialState ?? ('S0' as S);
+    this.transitions = config.transitions;
+    this.currentState = this.q0;
   }
 
   /**
@@ -24,7 +65,7 @@ export abstract class FSM<Input = string | number | boolean> {
    * @returns The new state of the FSM.
    * @throws Error if no transition is defined for the current state and input.
    */
-  public transition(input: Input): FSMTypes.State {
+  public transition(input: I): S {
     const stateTransitions = this.transitions.get(this.currentState);
 
     if (!stateTransitions) {
@@ -48,16 +89,20 @@ export abstract class FSM<Input = string | number | boolean> {
    *
    * @returns The current state.
    */
-  public getState(): FSMTypes.State {
+  public getState(): S {
     return this.currentState;
   }
 
   /**
-   * Resets the FSM to a specific state.
+   * Resets the FSM to the initial state (q0) or a specific state.
    *
-   * @param initialState The state to reset to.
+   * @param initialState Optional state to reset to. If not provided, resets to q0.
    */
-  public reset(initialState: FSMTypes.State): void {
-    this.currentState = initialState;
+  public reset(initialState?: S): void {
+    if (initialState) {
+      this.currentState = initialState;
+    } else {
+      this.currentState = this.q0;
+    }
   }
 }
