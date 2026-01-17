@@ -128,7 +128,9 @@ export const FSMRunner: React.FC<FSMRunnerProps> = ({
 
   return (
     <Box flexDirection="column" padding={1}>
-      <Text>{paramLabel}</Text>
+      <Box marginBottom={1}>
+        <Text>{paramLabel}</Text>
+      </Box>
       <Text>Enter Binary Sequence:</Text>
       <Box>
         <Text color="cyan">{'> '}</Text>

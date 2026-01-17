@@ -12,8 +12,8 @@ export interface FSMConfig<S, I> {
   alphabet: Set<I>;
   /** q0: Initial state (q0 ∈ Q) */
   initialState: S;
-  /** F: Set of accepting/final states (F ⊆ Q) */
-  finalStates: Set<S>;
+  /** F: Set of accepting/final states (F ⊆ Q). Optional, defaults to empty set. */
+  finalStates?: Set<S>;
 }
 
 /**
@@ -27,7 +27,7 @@ export interface FSMConfig<S, I> {
  * δ: Transition function (δ: Q × Σ → Q)
  *
  * @template S The type of state in the FSM.
- * @template I The type of input the FSM accepts.
+ * @template I The type of input the FSM accepts. (string | number | boolean) - Needs to allow for input to be key in a Map.
  */
 export abstract class FSM<S = FSMTypes.State, I = string | number | boolean> {
   protected currentState: S;
@@ -58,7 +58,7 @@ export abstract class FSM<S = FSMTypes.State, I = string | number | boolean> {
     this.states = config.states;
     this.alphabet = config.alphabet;
     this.q0 = config.initialState;
-    this.finalStates = config.finalStates;
+    this.finalStates = config.finalStates ?? new Set();
 
     // Validate q0 ∈ Q
     if (!this.states.has(this.q0)) {

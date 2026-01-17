@@ -39,6 +39,31 @@ describe('FSM Base Class', () => {
     expect(() => new InvalidFSM()).toThrow(/not in Q/);
   });
 
+  it('defaults finalStates to empty set if not provided', () => {
+    class NoFinalFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
+      constructor() {
+        super({
+          states: new Set(['S0']),
+          alphabet: new Set(['0']),
+          initialState: 'S0',
+          // finalStates omitted
+        });
+        this.generateTransitions();
+      }
+      protected delta(
+        state: FSMTypes.State,
+        _input: FSMTypes.BinaryInput,
+      ): FSMTypes.State {
+        return state;
+      }
+    }
+
+    const fsm = new NoFinalFSM();
+    expect(fsm.finalStates).toBeInstanceOf(Set);
+    expect(fsm.finalStates.size).toBe(0);
+    expect(fsm.isFinalState()).toBe(false);
+  });
+
   it('throws error if input is not in alphabet', () => {
     const parityFSM = new ParityFSM();
     expect(() => parityFSM.transition('2' as FSMTypes.BinaryInput)).toThrow(

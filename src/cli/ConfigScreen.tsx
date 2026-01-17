@@ -32,7 +32,9 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
 
   return (
     <Box flexDirection="column" padding={1}>
-      <Text>{label}</Text>
+      <Box marginBottom={1}>
+        <Text>{label}</Text>
+      </Box>
       <Box>
         <Text color="green">{'> '}</Text>
         <TextInput

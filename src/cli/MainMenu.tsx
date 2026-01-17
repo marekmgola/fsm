@@ -31,10 +31,12 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onSelect }) => {
 
   return (
     <Box flexDirection="column" padding={1}>
-      <Text bold underline>
-        Select FSM Type:
-      </Text>
-      <Box flexDirection="column" marginTop={1}>
+      <Box marginBottom={1}>
+        <Text bold underline>
+          Select FSM Type:
+        </Text>
+      </Box>
+      <Box flexDirection="column">
         {options.map((opt, index) => (
           <Text
             key={opt.value}
