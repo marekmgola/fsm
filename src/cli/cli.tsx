@@ -1,159 +1,86 @@
-import { useState } from 'react';
-import { render, Box, Text, useApp } from 'ink';
-import TextInput from 'ink-text-input';
+import React, { useState } from 'react';
+import { render, Box, Text } from 'ink';
+import { MainMenu, type MenuOption } from './MainMenu.js';
+import { ConfigScreen } from './ConfigScreen.js';
+import { FSMRunner } from './FSMRunner.js'; // Assuming we fix exports
 import { NModFSM } from '../fsm/NModFSM.js';
-import type { BinaryInput } from '../types.js';
-import { isBinaryInput, toDecimal } from '../utils.js';
+import { LastNOnesFSM } from '../fsm/LastNOnesFSM.js';
+import type { FSM } from '../fsm/FSM.js';
+import type { BinaryInput, State } from '../types.js';
+
+type View = 'MENU' | 'CONFIG' | 'RUNNER';
 
 const App = () => {
-  const { exit } = useApp();
-  const [modulusStr, setModulusStr] = useState('');
-  const [modulus, setModulus] = useState<number | null>(null);
-  const [binaryInput, setBinaryInput] = useState('');
-  const [result, setResult] = useState<string | null>(null);
-  const [timeTaken, setTimeTaken] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [view, setView] = useState<View>('MENU');
+  const [fsmType, setFsmType] = useState<MenuOption | null>(null);
+  const [fsmInstance, setFsmInstance] = useState<FSM<
+    State,
+    BinaryInput
+  > | null>(null);
+  const [paramLabel, setParamLabel] = useState('');
 
-  const handleModulusSubmit = (value: string) => {
-    const parsed = parseInt(value, 10);
-    if (isNaN(parsed) || parsed <= 0) {
-      setError('Please enter a valid positive integer modulus.');
-      return;
-    }
-    setModulus(parsed);
-    setError(null);
+  const handleMenuSelect = (option: MenuOption) => {
+    setFsmType(option);
+    setView('CONFIG');
   };
 
-  const handleBinarySubmit = (value: string) => {
-    if (value === 'exit') {
-      exit();
-      return;
-    }
-    if (value === 'back') {
-      setModulus(null);
-      setResult(null);
-      setBinaryInput('');
-      setError(null);
-      return;
-    }
+  const handleConfigSubmit = (n: number) => {
+    if (!fsmType) return;
 
-    if (!modulus) return;
-    if (!isBinaryInput(value)) {
-      setError(
-        'Please enter a valid binary string (0s and 1s only), "back" to reset, or "exit" to quit.',
-      );
-      return;
+    let instance: FSM<State, BinaryInput>;
+    let label = '';
+
+    if (fsmType === 'MODULO') {
+      instance = new NModFSM(n);
+      label = `FSM: Modulo ${n}`;
+    } else {
+      instance = new LastNOnesFSM(n);
+      label = `FSM: Last ${n} Ones`;
     }
 
-    try {
-      const fsm = new NModFSM(modulus);
-      const startTime = performance.now();
-
-      for (const char of value) {
-        fsm.transition(char as BinaryInput);
-      }
-
-      const endTime = performance.now();
-      const finalState = fsm.getState();
-      const remainder = finalState.substring(1);
-
-      setResult(remainder);
-      setTimeTaken(endTime - startTime);
-      setError(null);
-    } catch (e) {
-      setError((e as Error).message);
-    }
+    setFsmInstance(instance);
+    setParamLabel(label);
+    setView('RUNNER');
   };
 
-  const content = (() => {
-    if (modulus === null) {
-      return (
-        <Box flexDirection="column" padding={1}>
-          <Text>Enter Modulus (N):</Text>
-          <Box>
-            <Text color="green">{'> '}</Text>
-            <TextInput
-              value={modulusStr}
-              onChange={setModulusStr}
-              onSubmit={handleModulusSubmit}
-            />
-          </Box>
-          {error && <Text color="red">{error}</Text>}
-        </Box>
-      );
-    }
-
-    return (
-      <Box flexDirection="column" padding={1}>
-        <Text>
-          Modulus set to: <Text color="green">{modulus}</Text>
-        </Text>
-        <Text>
-          Enter Binary Number (press Enter to calculate, 'back' to reset, 'exit'
-          to quit):
-        </Text>
-        <Box>
-          <Text color="cyan">{'> '}</Text>
-          <TextInput
-            value={binaryInput}
-            onChange={(val) => {
-              setBinaryInput(val);
-              setResult(null);
-              setTimeTaken(null);
-              setError(null);
-            }}
-            onSubmit={handleBinarySubmit}
+  const renderContent = () => {
+    switch (view) {
+      case 'MENU':
+        return <MainMenu onSelect={handleMenuSelect} />;
+      case 'CONFIG':
+        return (
+          <ConfigScreen
+            label={
+              fsmType === 'MODULO'
+                ? 'Enter Modulus (N):'
+                : 'Enter N (Number of 1s):'
+            }
+            onBack={() => setView('MENU')}
+            onSubmit={handleConfigSubmit}
           />
-        </Box>
-        {isBinaryInput(binaryInput) && (
-          <Box marginLeft={2}>
-            <Text dimColor>
-              Decimal: <Text color="yellow">{toDecimal(binaryInput)}</Text>
-            </Text>
-          </Box>
-        )}
-        {binaryInput !== '' &&
-          !isBinaryInput(binaryInput) &&
-          !['back', 'exit'].includes(binaryInput) && (
-            <Box marginLeft={2}>
-              <Text color="red">Error: Not a binary number</Text>
-            </Box>
-          )}
-        {error && <Text color="red">Error: {error}</Text>}
-        {result !== null && (
-          <Box
-            marginTop={1}
-            flexDirection="column"
-            borderStyle="round"
-            borderColor="green"
-            paddingX={1}
-          >
-            <Text>
-              Input (Decimal):{' '}
-              <Text color="blue">{toDecimal(binaryInput)}</Text>
-            </Text>
-            <Text>
-              Modulo: <Text color="magenta">{modulus}</Text>
-            </Text>
-            <Text>
-              Remainder:{' '}
-              <Text color="yellow" bold>
-                {result}
-              </Text>
-            </Text>
-            <Text dimColor>Time taken: {timeTaken?.toFixed(4)} ms</Text>
-          </Box>
-        )}
-      </Box>
-    );
-  })();
+        );
+      case 'RUNNER':
+        if (!fsmInstance)
+          return <Text color="red">Error: No FSM Instance</Text>;
+        return (
+          <FSMRunner
+            fsm={fsmInstance}
+            fsmType={fsmType}
+            paramLabel={paramLabel}
+            onBack={() => setView('CONFIG')}
+          />
+        );
+      default:
+        return <Text>Unknown View</Text>;
+    }
+  };
 
   return (
     <Box
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      height={process.stdout.rows - 2}
+      height={(process.stdout.rows || 24) - 2}
     >
       <Box
         borderStyle="double"
@@ -163,7 +90,7 @@ const App = () => {
         width={80}
         height={20}
       >
-        {content}
+        {renderContent()}
       </Box>
     </Box>
   );

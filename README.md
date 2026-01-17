@@ -43,10 +43,11 @@ The project is built around a robust Object-Oriented architecture designed for e
 
 - **`FSM<Input>`**: An abstract base class that defines the core logic for any Finite State Machine. It manages the current `State` and handles `transitions` based on generic `Input`.
 - **`NModFSM`**: A concrete implementation of `FSM` that calculates the remainder of a binary number modulo `N`. It dynamically generates states `S0` to `Sn-1` and their transition logic upon instantiation.
+- **`LastNOnesFSM` (Bonus)**: A concrete implementation that detects if the last `N` bits of the input stream are strictly 1s. It generates states `S0` to `Sn` where `Si` represents a streak of `i` ones.
 
 ### Diagram
 
-```mermaid
+````mermaid
 classDiagram
     class FSM {
         <<abstract>>
@@ -64,12 +65,16 @@ classDiagram
         +constructor(modulus: number)
     }
 
+    class LastNOnesFSM {
+        -n: number
+        +constructor(n: number)
+    }
+
     FSM <|-- NModFSM : extends
+    FSM <|-- LastNOnesFSM : extends
 
-    note for NModFSM "Dynamically generates\nstates S0..Sn-1\nbased on Modulo N"
-```
 
-## CLI
+## CLI Playground
 
 The project includes an interactive Command Line Interface (CLI) built with `React Ink`. It allows users to define a modulus, input a binary string, and simulate the FSM transitions in real-time.
 
@@ -90,7 +95,7 @@ To run the test suite:
 
 ```bash
 npm test
-```
+````
 
 ## Pre-commit Hooks
 
