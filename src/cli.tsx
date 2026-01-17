@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { render, Box, Text, useApp } from 'ink';
 import TextInput from 'ink-text-input';
 import { NModFSM } from './NModFSM.js';

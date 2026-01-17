@@ -1,6 +1,12 @@
 import { FSM } from './FSM.js';
 import type * as FSMTypes from './types.js';
 
+/**
+ * Concrete implementation of FSM for Modulo N arithmetic.
+ * Calculates the remainder of a number represented by a binary string when divided by `N`.
+ *
+ * Dynamically generates states (S0 to Sn-1) and their transitions upon instantiation.
+ */
 export class NModFSM extends FSM {
   private readonly modulus: number;
   protected readonly transitions: Map<
@@ -8,6 +14,12 @@ export class NModFSM extends FSM {
     Map<FSMTypes.BinaryInput, FSMTypes.State>
   >;
 
+  /**
+   * Creates an instance of NModFSM.
+   *
+   * @param modulus The positive integer modulus (N) for calculation.
+   * @throws Error if modulus is not a positive integer.
+   */
   constructor(modulus: number) {
     super('S0'); // Initial state S0
     this.modulus = modulus;

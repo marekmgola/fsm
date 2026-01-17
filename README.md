@@ -2,6 +2,39 @@
 
 A versatile TypeScript implementation of a Finite State Machine (FSM), featuring a concrete implementation for Modulo N calculations and an interactive CLI.
 
+## Getting Started
+
+### Prerequisites
+
+- **Node.js**: v20+ (ESM support required)
+- **npm**: Bundled with Node.js
+
+### Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/marekmgola/fsm.git
+   cd fsm
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Build the project**:
+
+   ```bash
+   npm run build
+   ```
+
+4. **Run the CLI**:
+   ```bash
+   npm start
+   ```
+
 ## Global Architecture
 
 The project is built around a robust Object-Oriented architecture designed for extensibility.
