@@ -67,19 +67,11 @@ classDiagram
     note for NModFSM "Dynamically generates\nstates S0..Sn-1\nbased on Modulo N"
 ```
 
-## CLI Showcase
+## CLI
 
 The project includes an interactive Command Line Interface (CLI) built with `React Ink`. It allows users to define a modulus, input a binary string, and simulate the FSM transitions in real-time.
 
-![CLI Showcase](assets/cli.png)
-
-### Usage
-
-To start the interactive CLI:
-
-```bash
-npm run cli
-```
+![CLI](assets/cli.png)
 
 **Workflow:**
 
