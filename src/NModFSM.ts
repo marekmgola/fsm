@@ -21,33 +21,51 @@ export class NModFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
       throw new Error('Modulus must be a positive integer.');
     }
 
-    const transitions = new Map<
-      FSMTypes.State,
-      Map<FSMTypes.BinaryInput, FSMTypes.State>
-    >();
-
-    // Generate states S0 to S{n-1} and transitions
+    // Q: Finite set of states { S0, ..., S(N-1) }
+    const states = new Set<FSMTypes.State>();
     for (let i = 0; i < modulus; i++) {
-      const currentState: FSMTypes.State = `S${i}`;
-      const stateTransitions = new Map<FSMTypes.BinaryInput, FSMTypes.State>();
-
-      // Input '0'
-      const nextVal0 = (2 * i) % modulus;
-      const nextState0: FSMTypes.State = `S${nextVal0}`;
-      stateTransitions.set('0', nextState0);
-
-      // Input '1'
-      const nextVal1 = (2 * i + 1) % modulus;
-      const nextState1: FSMTypes.State = `S${nextVal1}`;
-      stateTransitions.set('1', nextState1);
-
-      transitions.set(currentState, stateTransitions);
+      states.add(`S${i}`);
     }
 
+    // Σ: Finite input alphabet { '0', '1' }
+    const alphabet = new Set<FSMTypes.BinaryInput>(['0', '1']);
+
+    // q0: Initial state
+    const initialState: FSMTypes.State = 'S0';
+
+    // F: Set of accepting states. For Modulo FSM, usually S0 (remainder 0) is accepting.
+    const finalStates = new Set<FSMTypes.State>(['S0']);
+
     super({
-      transitions,
+      states,
+      alphabet,
+      initialState,
+      finalStates,
     });
 
     this.modulus = modulus;
+
+    // IMPORTANT: Generate transitions using the abstract delta method
+    // This calls this.delta() for all Q x Σ
+    this.generateTransitions();
+  }
+
+  /**
+   * Implementation of the transition function δ.
+   * Calculates the next state based on the current state (remainder) and input bit.
+   */
+  protected delta(
+    state: FSMTypes.State,
+    input: FSMTypes.BinaryInput,
+  ): FSMTypes.State {
+    // Extract integer remainder from state string "S{r}"
+    const remainder = parseInt(state.substring(1), 10);
+
+    const bit = input === '0' ? 0 : 1;
+
+    // Logic: New Remainder = (Current * 2 + Input) % Modulus
+    const nextRemainder = (remainder * 2 + bit) % this.modulus;
+
+    return `S${nextRemainder}`;
   }
 }

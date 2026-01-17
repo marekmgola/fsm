@@ -3,29 +3,26 @@ import { FSM } from '../src/FSM.js';
 import { NModFSM } from '../src/NModFSM.js';
 import type * as FSMTypes from '../src/types.js';
 
-// Concrete implementation for testing base FSM logic
+// Concrete implementation for testing base FSM logic (Parity Checker)
 class ParityFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
   constructor() {
-    // S0 (Even): 0->S0, 1->S1
-    const s0Trans = new Map<FSMTypes.BinaryInput, FSMTypes.State>();
-    s0Trans.set('0', 'S0');
-    s0Trans.set('1', 'S1');
-
-    // S1 (Odd): 0->S1, 1->S0
-    const s1Trans = new Map<FSMTypes.BinaryInput, FSMTypes.State>();
-    s1Trans.set('0', 'S1');
-    s1Trans.set('1', 'S0');
-
-    const transitions = new Map<
-      FSMTypes.State,
-      Map<FSMTypes.BinaryInput, FSMTypes.State>
-    >();
-    transitions.set('S0', s0Trans);
-    transitions.set('S1', s1Trans);
-
+    // Q = {S0, S1}, Σ = {0, 1}, q0 = S0
     super({
-      transitions,
+      states: new Set(['S0', 'S1']),
+      alphabet: new Set(['0', '1']),
+      initialState: 'S0',
+      finalStates: new Set(['S0']), // Even parity accepted
     });
+    this.generateTransitions();
+  }
+
+  protected delta(
+    state: FSMTypes.State,
+    input: FSMTypes.BinaryInput,
+  ): FSMTypes.State {
+    if (state === 'S0') return input === '0' ? 'S0' : 'S1';
+    if (state === 'S1') return input === '0' ? 'S1' : 'S0';
+    return 'S0';
   }
 }
 
@@ -41,22 +38,41 @@ describe('FSM Base Class', () => {
     expect(parityFSM.transition('1')).toBe('S1');
   });
 
-  it('throws error on invalid transition', () => {
-    // Force an invalid state to test error handling
-    // We can't easily force invalid input with strict typing '0'|'1'
-    // without casting, but let's test a missing state config if possible
-    // or just rely on the fact that if we accessed a state not in the map it throws.
-
-    // Actually, let's create a broken FSM for this test
-    class BrokenFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
+  it('throws error if generated transition result is not in Q', () => {
+    class InvalidFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
       constructor() {
         super({
-          transitions: new Map(), // Empty transitions shouldn't crash constructor but will fail transition()
+          states: new Set(['S0']),
+          alphabet: new Set(['0']),
+          initialState: 'S0',
+          finalStates: new Set(),
         });
+        // This should throw because delta returns S99 which is not in Q
+        this.generateTransitions();
+      }
+      protected delta(
+        _state: FSMTypes.State,
+        _input: FSMTypes.BinaryInput,
+      ): FSMTypes.State {
+        return 'S99' as FSMTypes.State;
       }
     }
-    const broken = new BrokenFSM();
-    expect(() => broken.transition('0')).toThrow(/No transitions defined/);
+
+    expect(() => new InvalidFSM()).toThrow(/not in Q/);
+  });
+
+  it('throws error if input is not in alphabet', () => {
+    const parityFSM = new ParityFSM();
+    expect(() => parityFSM.transition('2' as FSMTypes.BinaryInput)).toThrow(
+      /not in the alphabet/,
+    );
+  });
+
+  it('checks isFinalState correctly', () => {
+    const parityFSM = new ParityFSM();
+    expect(parityFSM.isFinalState()).toBe(true); // S0 is final
+    parityFSM.transition('1');
+    expect(parityFSM.isFinalState()).toBe(false); // S1 is not final
   });
 });
 
@@ -79,6 +95,7 @@ describe('NModFSM', () => {
       expect(fsm.transition('1')).toBe('S0');
       // 0 -> (2*0 + 0)%3 = 0 -> S0
       expect(fsm.transition('0')).toBe('S0');
+      expect(fsm.isAccepting()).toBe(true);
     });
 
     it('calculates transitions correctly for example sequence 101 (Binary 5, 5%3=2)', () => {
@@ -89,6 +106,7 @@ describe('NModFSM', () => {
       expect(fsm.transition('0')).toBe('S2');
       // 1 -> (2*2 + 1)%3 = 5%3 = 2 -> S2
       expect(fsm.transition('1')).toBe('S2');
+      expect(fsm.isAccepting()).toBe(false);
     });
 
     it('verifies all transitions for Mod 3', () => {
