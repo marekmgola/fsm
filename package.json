@@ -6,7 +6,7 @@
   "main": "dist/src/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/src/cli.js",
+    "start": "node dist/src/cli/cli.js",
     "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

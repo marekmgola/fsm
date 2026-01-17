@@ -1,5 +1,5 @@
 import { FSM } from './FSM.js';
-import type * as FSMTypes from './types.js';
+import type * as FSMTypes from '../types.js';
 
 /**
  * Concrete implementation of FSM for Modulo N arithmetic.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { NModFSM } from '../src/NModFSM.js';
+import { NModFSM } from '../src/fsm/NModFSM.js';
 import type { BinaryInput } from '../src/types.js';
 
 describe('NModFSM Property Tests (Fuzzing)', () => {

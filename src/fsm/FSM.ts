@@ -1,4 +1,4 @@
-import type * as FSMTypes from './types.js';
+import type * as FSMTypes from '../types.js';
 
 /**
  * Configuration object for FSM, matching the formal definition.

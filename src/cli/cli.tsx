@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { render, Box, Text, useApp } from 'ink';
 import TextInput from 'ink-text-input';
-import { NModFSM } from './NModFSM.js';
-import type { BinaryInput } from './types.js';
-import { isBinaryInput, toDecimal } from './utils.js';
+import { NModFSM } from '../fsm/NModFSM.js';
+import type { BinaryInput } from '../types.js';
+import { isBinaryInput, toDecimal } from '../utils.js';
 
 const App = () => {
   const { exit } = useApp();

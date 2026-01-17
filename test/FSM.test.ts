@@ -1,30 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { FSM } from '../src/FSM.js';
-import { NModFSM } from '../src/NModFSM.js';
+import { FSM } from '../src/fsm/FSM.js';
+import { NModFSM } from '../src/fsm/NModFSM.js';
+import { ParityFSM } from '../src/fsm/ParityFSM.js';
 import type * as FSMTypes from '../src/types.js';
-
-// Concrete implementation for testing base FSM logic (Parity Checker)
-class ParityFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
-  constructor() {
-    // Q = {S0, S1}, Σ = {0, 1}, q0 = S0
-    super({
-      states: new Set(['S0', 'S1']),
-      alphabet: new Set(['0', '1']),
-      initialState: 'S0',
-      finalStates: new Set(['S0']), // Even parity accepted
-    });
-    this.generateTransitions();
-  }
-
-  protected delta(
-    state: FSMTypes.State,
-    input: FSMTypes.BinaryInput,
-  ): FSMTypes.State {
-    if (state === 'S0') return input === '0' ? 'S0' : 'S1';
-    if (state === 'S1') return input === '0' ? 'S1' : 'S0';
-    return 'S0';
-  }
-}
 
 describe('FSM Base Class', () => {
   // Bonus: Parity Checker FSM (Even/Odd number of 1s)
