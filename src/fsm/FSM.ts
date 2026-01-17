@@ -32,7 +32,6 @@ export interface FSMConfig<S, I> {
 export abstract class FSM<S = FSMTypes.State, I = string | number | boolean> {
   protected currentState: S;
 
-  // Formal properties
   /** Q: Finite set of states */
   public readonly states: Set<S>;
 
@@ -45,11 +44,11 @@ export abstract class FSM<S = FSMTypes.State, I = string | number | boolean> {
   /** F: Set of accepting/final states */
   public readonly finalStates: Set<S>;
 
-  /** δ: Transition function (lookup table populated by validation) */
+  /** δ: Transition function */
   protected readonly transitions: Map<S, Map<I, S>>;
 
   /**
-   * Initializes the FSM with a configuration object matching the formal definition.
+   * Initializes the FSM with a configuration object.
    *
    * @param config The FSM configuration (Q, Σ, q0, F).
    * @throws Error if q0 is not in Q or if F is not a subset of Q.
@@ -60,14 +59,12 @@ export abstract class FSM<S = FSMTypes.State, I = string | number | boolean> {
     this.q0 = config.initialState;
     this.finalStates = config.finalStates ?? new Set();
 
-    // Validate q0 ∈ Q
     if (!this.states.has(this.q0)) {
       throw new Error(
         `Initial state ${String(this.q0)} must be in the set of states Q.`,
       );
     }
 
-    // Validate F ⊆ Q
     for (const state of this.finalStates) {
       if (!this.states.has(state)) {
         throw new Error(

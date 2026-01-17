@@ -5,8 +5,8 @@ import { ParityFSM } from '../src/fsm/ParityFSM.js';
 import type * as FSMTypes from '../src/types.js';
 
 describe('FSM Base Class', () => {
-  // Bonus: Parity Checker FSM (Even/Odd number of 1s)
-  it('runs a simple Parity Checker FSM (Bonus)', () => {
+  // Parity Checker FSM
+  it('runs a simple Parity Checker FSM', () => {
     const parityFSM = new ParityFSM();
 
     expect(parityFSM.getState()).toBe('S0');

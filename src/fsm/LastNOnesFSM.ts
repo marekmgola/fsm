@@ -2,10 +2,9 @@ import { FSM } from './FSM.js';
 import type * as FSMTypes from '../types.js';
 
 /**
- * Concrete implementation of FSM for checking if the last N bits are 1s.
+ * FSM implementation for checking if the last N bits are 1s.
  *
- * Dynamically generates states (S0 to Sn) and their transitions.
- * S(k) represents "k consecutive ones have been seen immediately prior to now".
+ * S(k) represents "k consecutive ones have been seen".
  */
 export class LastNOnesFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
   private readonly n: number;
@@ -21,20 +20,14 @@ export class LastNOnesFSM extends FSM<FSMTypes.State, FSMTypes.BinaryInput> {
       throw new Error('N must be a positive integer.');
     }
 
-    // Q: Finite set of states { S0, ..., Sn }
     const states = new Set<FSMTypes.State>();
     for (let i = 0; i <= n; i++) {
-      // cast to generic State type to satisfy TS, though we know it fits the pattern
       states.add(`S${i}` as FSMTypes.State);
     }
 
-    // Σ: Finite input alphabet { '0', '1' }
     const alphabet = new Set<FSMTypes.BinaryInput>(['0', '1']);
-
-    // q0: Initial state (0 consecutive ones seen initially)
     const initialState: FSMTypes.State = 'S0';
-
-    // F: Set of accepting states { Sn } (we have seen N ones)
+    // Accepting state is Sn (we have seen N ones)
     const finalStates = new Set<FSMTypes.State>([`S${n}` as FSMTypes.State]);
 
     super({

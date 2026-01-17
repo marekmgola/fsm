@@ -89,15 +89,23 @@ The project includes an interactive Command Line Interface (CLI) built with `Rea
 
 ## Running Tests
 
-We use [Vitest](https://vitest.dev/) for unit testing to ensure the correctness of the FSM logic.
+ We use [Vitest](https://vitest.dev/) for unit testing to ensure the correctness of the FSM logic.
 
-To run the test suite:
+ To run the test suite:
 
-```bash
-npm test
-````
+ ```bash
+ npm test
+ ```
 
-## Pre-commit Hooks
+ ### Testing Strategies
+
+ Beyond standard unit tests, we employ advanced testing techniques to ensure robustness:
+
+ - **Graph Reachability**: We perform Breadth-First Search (BFS) on the generated state machine to verify that *all* states in the `N`-state machine are reachable from `q0`. This mathematically proves the connectivity of the automaton.
+ - **Stress & Performance**: We stress-test the state generation logic with large inputs (e.g., Modulo 5000), ensuring the system handles thousands of states and transitions efficiently.
+ - **Behavioral Equivalence**: We verify that the sophisticated `NModFSM(2)` behaves *exactly* like a simple "Last Bit Parity" check, proving the complex model reduces correctly to simpler base cases.
+
+ ## Pre-commit Hooks
 
 This repository ensures code quality using [Husky](https://typicode.github.io/husky/) pre-commit hooks.
 
@@ -108,3 +116,4 @@ Before every commit, the following checks are automatically executed:
 3.  **Tests**: Runs `npm test` to verify no regressions were introduced.
 
 If any of these steps fail, the commit will be aborted.
+````
