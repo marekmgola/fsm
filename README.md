@@ -35,45 +35,6 @@ A versatile TypeScript implementation of a Finite State Machine (FSM), featuring
    npm start
    ```
 
-## Global Architecture
-
-The project is built around a robust Object-Oriented architecture designed for extensibility.
-
-### Core Components
-
-- **`FSM<Input>`**: An abstract base class that defines the core logic for any Finite State Machine. It manages the current `State` and handles `transitions` based on generic `Input`.
-- **`NModFSM`**: A concrete implementation of `FSM` that calculates the remainder of a binary number modulo `N`. It dynamically generates states `S0` to `Sn-1` and their transition logic upon instantiation.
-- **`LastNOnesFSM` (Bonus)**: A concrete implementation that detects if the last `N` bits of the input stream are strictly 1s. It generates states `S0` to `Sn` where `Si` represents a streak of `i` ones.
-
-### Diagram
-
-````mermaid
-classDiagram
-    class FSM {
-        <<abstract>>
-        #currentState: S
-        #q0: S
-        #transitions: Map
-        +constructor(config: FSMConfig)
-        +transition(input: I): S
-        +getState(): S
-        +reset(initialState?: S): void
-    }
-
-    class NModFSM {
-        -modulus: number
-        +constructor(modulus: number)
-    }
-
-    class LastNOnesFSM {
-        -n: number
-        +constructor(n: number)
-    }
-
-    FSM <|-- NModFSM : extends
-    FSM <|-- LastNOnesFSM : extends
-
-
 ## CLI Playground
 
 The project includes an interactive Command Line Interface (CLI) built with `React Ink`. It allows users to define a modulus, input a binary string, and simulate the FSM transitions in real-time.
@@ -89,23 +50,23 @@ The project includes an interactive Command Line Interface (CLI) built with `Rea
 
 ## Running Tests
 
- We use [Vitest](https://vitest.dev/) for unit testing to ensure the correctness of the FSM logic.
+We use [Vitest](https://vitest.dev/) for unit testing to ensure the correctness of the FSM logic.
 
- To run the test suite:
+To run the test suite:
 
- ```bash
- npm test
- ```
+```bash
+npm test
+```
 
- ### Testing Strategies
+### Testing Strategies
 
- Beyond standard unit tests, we employ advanced testing techniques to ensure robustness:
+Beyond standard unit tests, we employ advanced testing techniques to ensure robustness:
 
- - **Graph Reachability**: We perform Breadth-First Search (BFS) on the generated state machine to verify that *all* states in the `N`-state machine are reachable from `q0`. This mathematically proves the connectivity of the automaton.
- - **Stress & Performance**: We stress-test the state generation logic with large inputs (e.g., Modulo 5000), ensuring the system handles thousands of states and transitions efficiently.
- - **Behavioral Equivalence**: We verify that the sophisticated `NModFSM(2)` behaves *exactly* like a simple "Last Bit Parity" check, proving the complex model reduces correctly to simpler base cases.
+- **Graph Reachability**: We perform Breadth-First Search (BFS) on the generated state machine to verify that _all_ states in the `N`-state machine are reachable from `q0`. This mathematically proves the connectivity of the automaton.
+- **Stress & Performance**: We stress-test the state generation logic with large inputs (e.g., Modulo 5000), ensuring the system handles thousands of states and transitions efficiently.
+- **Behavioral Equivalence**: We verify that the sophisticated `NModFSM(2)` behaves _exactly_ like a simple "Last Bit Parity" check, proving the complex model reduces correctly to simpler base cases.
 
- ## Pre-commit Hooks
+## Pre-commit Hooks
 
 This repository ensures code quality using [Husky](https://typicode.github.io/husky/) pre-commit hooks.
 
@@ -116,4 +77,51 @@ Before every commit, the following checks are automatically executed:
 3.  **Tests**: Runs `npm test` to verify no regressions were introduced.
 
 If any of these steps fail, the commit will be aborted.
-````
+
+## Global Architecture
+
+The project is built around a robust Object-Oriented architecture designed for extensibility.
+
+### Core Components
+
+- **`FSM<State, Input>`**: An abstract base class that defines the core logic for any Finite State Machine. It manages the current `State` and handles `transitions` based on generic `Input`.
+- **`NModFSM`**: A concrete implementation of `FSM` that calculates the remainder of a binary number modulo `N`. It dynamically generates states `S0` to `Sn-1` and their transition logic upon instantiation.
+- **`LastNOnesFSM` (Bonus)**: A concrete implementation that detects if the last `N` bits of the input stream are strictly 1s. It generates states `S0` to `Sn` where `Si` represents a streak of `i` ones.
+
+### Diagram
+
+```mermaid
+classDiagram
+    class FSM {
+        <<abstract>>
+        #currentState: S
+        +states: Set~S~
+        +alphabet: Set~I~
+        +q0: S
+        +finalStates: Set~S~
+        #transitions: Map~S, Map~I, S~~
+        +constructor(config: FSMConfig)
+        +transition(input: I): S
+        +getState(): S
+        +isAccepting(): boolean
+        +isFinalState(): boolean
+        +reset(state?: S): void
+        #delta(state: S, input: I): S*
+        #generateTransitions(): void
+    }
+
+    class NModFSM {
+        -modulus: number
+        +constructor(modulus: number)
+        #delta(state: S, input: I): S
+    }
+
+    class LastNOnesFSM {
+        -n: number
+        +constructor(n: number)
+        #delta(state: S, input: I): S
+    }
+
+    FSM <|-- NModFSM : extends
+    FSM <|-- LastNOnesFSM : extends
+```
