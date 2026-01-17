@@ -3,6 +3,7 @@ import { render, Box, Text, useApp } from 'ink';
 import TextInput from 'ink-text-input';
 import { NModFSM } from './NModFSM.js';
 import type { BinaryInput } from './types.js';
+import { isBinaryInput, toDecimal } from './utils.js';
 
 const App = () => {
   const { exit } = useApp();
@@ -37,7 +38,7 @@ const App = () => {
     }
 
     if (!modulus) return;
-    if (!/^[01]+$/.test(value)) {
+    if (!isBinaryInput(value)) {
       setError(
         'Please enter a valid binary string (0s and 1s only), "back" to reset, or "exit" to quit.',
       );
@@ -104,6 +105,20 @@ const App = () => {
             onSubmit={handleBinarySubmit}
           />
         </Box>
+        {isBinaryInput(binaryInput) && (
+          <Box marginLeft={2}>
+            <Text dimColor>
+              Decimal: <Text color="yellow">{toDecimal(binaryInput)}</Text>
+            </Text>
+          </Box>
+        )}
+        {binaryInput !== '' &&
+          !isBinaryInput(binaryInput) &&
+          !['back', 'exit'].includes(binaryInput) && (
+            <Box marginLeft={2}>
+              <Text color="red">Error: Not a binary number</Text>
+            </Box>
+          )}
         {error && <Text color="red">Error: {error}</Text>}
         {result !== null && (
           <Box
@@ -115,9 +130,7 @@ const App = () => {
           >
             <Text>
               Input (Decimal):{' '}
-              <Text color="blue">
-                {binaryInput ? BigInt('0b' + binaryInput).toString() : ''}
-              </Text>
+              <Text color="blue">{toDecimal(binaryInput)}</Text>
             </Text>
             <Text>
               Modulo: <Text color="magenta">{modulus}</Text>
